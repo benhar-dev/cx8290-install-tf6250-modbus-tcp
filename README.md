@@ -12,6 +12,8 @@ Use of this information, code, or scripts provided is at your own risk. Readers 
 
 This is a simple "how to" guide for installing the basic configuration of Modbus TCP server on a CX8290 running Beckhoff Realtime Linux.
 
+For testing the server, you can use [TF6250 Server Test](https://github.com/benhar-dev/electron-tf6250-server-test).
+
 ## Manual Steps
 
 1. Install Driver
@@ -49,16 +51,31 @@ sudo systemctl reload nftables
 sudo nft list ruleset
 ```
 
+4. Ensure you have enabled the TF6250 Trial License
+
+![image](./docs/images/License.png)
+
+5. Configure the TwinCAT PLC Project
+
+If no configuration file is saved, then the default server configuration is loaded. The default configuration requires a GVL.TcGVL with the following content,
+
+```
+VAR_GLOBAL
+	mb_Input_Coils : ARRAY [0..255] OF BOOL;
+	mb_Output_Coils : ARRAY [0..255] OF BOOL;
+	mb_Input_Registers : ARRAY [0..255] OF WORD;
+	mb_Output_Registers : ARRAY [0..255] OF WORD;
+END_VAR
+```
+
+6. Activate and run your TwinCAT project.
+
 ## Quick Start for X001, X101 and X102 (One-Liner)
 
 Run this single command to install the driver, write the config file, and reload the firewall automatically for X001, X101 and X102:
 
 ```bash
-sudo apt update && \
-sudo apt install -y tf6250-modbus-tcp && \
-printf "table inet filter {\n  chain input {\n    # accept Modbus\n    iifname { \"end0\", \"tctap0\" } tcp dport 502 accept\n  }\n}\n" | sudo tee /etc/nftables.conf.d/60-modbus-tcp.conf > /dev/null && \
-sudo systemctl reload nftables && \
-sudo nft list ruleset
+sudo apt update && sudo apt install -y tf6250-modbus-tcp && printf "table inet filter {\n  chain input {\n    # accept Modbus\n    iifname { \"end0\", \"tctap0\" } tcp dport 502 accept\n  }\n}\n" | sudo tee /etc/nftables.conf.d/60-modbus-tcp.conf > /dev/null && sudo systemctl reload nftables && sudo nft list ruleset
 ```
 
 ## Quick Start for X001 (One-Liner)
@@ -66,11 +83,7 @@ sudo nft list ruleset
 Run this single command to install the driver, write the config file, and reload the firewall automatically for X001:
 
 ```bash
-sudo apt update && \
-sudo apt install -y tf6250-modbus-tcp && \
-printf "table inet filter {\n  chain input {\n    # accept Modbus\n    iifname \"end0\" tcp dport 502 accept\n  }\n}\n" | sudo tee /etc/nftables.conf.d/60-modbus-tcp.conf > /dev/null && \
-sudo systemctl reload nftables && \
-sudo nft list ruleset
+sudo apt update && sudo apt install -y tf6250-modbus-tcp && printf "table inet filter {\n  chain input {\n    # accept Modbus\n    iifname \"end0\" tcp dport 502 accept\n  }\n}\n" | sudo tee /etc/nftables.conf.d/60-modbus-tcp.conf > /dev/null && sudo systemctl reload nftables && sudo nft list ruleset
 ```
 
 ## Quick Start for X101, X102 (One-Liner)
@@ -78,9 +91,5 @@ sudo nft list ruleset
 Run this single command to install the driver, write the config file, and reload the firewall automatically for X101 and X102:
 
 ```bash
-sudo apt update && \
-sudo apt install -y tf6250-modbus-tcp && \
-printf "table inet filter {\n  chain input {\n    # accept Modbus\n    iifname \"tctap0\" tcp dport 502 accept\n  }\n}\n" | sudo tee /etc/nftables.conf.d/60-modbus-tcp.conf > /dev/null && \
-sudo systemctl reload nftables && \
-sudo nft list ruleset
+sudo apt update && sudo apt install -y tf6250-modbus-tcp && printf "table inet filter {\n  chain input {\n    # accept Modbus\n    iifname \"tctap0\" tcp dport 502 accept\n  }\n}\n" | sudo tee /etc/nftables.conf.d/60-modbus-tcp.conf > /dev/null && sudo systemctl reload nftables && sudo nft list ruleset
 ```
